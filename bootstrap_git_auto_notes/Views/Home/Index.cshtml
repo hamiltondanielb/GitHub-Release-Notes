@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+@section JavaScript{
+    @Scripts.Render("~/Scripts/ChooseRepo.js")
+}
+
+@using (Html.BeginForm("RepoReleases", "Home", new { @class = "form-inline" }))
+{
+    <div id="repo_selection">@Helpers.ShowRepos(ViewBag.repositories)</div>
+    
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-lg btn-block pull-right">Submit Selection</button>
+    </div>
+}
+
+<br /><br /><br /><br />

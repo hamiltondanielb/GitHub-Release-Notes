@@ -1,0 +1,41 @@
+﻿@{
+    ViewBag.Title = "Choose Comparison";
+}
+
+@section JavaScript {
+    @Scripts.Render("~/Scripts/AutoCompleteRelease.js");
+}
+
+
+@using (Html.BeginForm("ReleaseNotes", "Home", FormMethod.Post, new { @class = "form-horizontal", @role ="form"}))
+{
+    List<SelectListItem> items = new List<SelectListItem>();
+    string repo = ViewBag.repo;
+    
+    foreach(bootstrap_git_auto_notes.GitClasses.Release release in ViewBag.releases)
+    {
+         items.Add(new SelectListItem() { Text = release.name, Value = release.tag_name, Selected = false });
+    }
+    List<bootstrap_git_auto_notes.GitClasses.Release> releases = ViewBag.releases as List<bootstrap_git_auto_notes.GitClasses.Release>;
+    SelectList slist_Releases = new SelectList(items, "Value", "Text");
+    
+    <div class="form-group">
+        @Html.Label("From:", new {@class="col-sm-1 control-label", @style="font-size: 20px; font-weight:normal; margin-top:-2px"})
+        <span style="position:relative">
+            @Html.TextBox("txb_FromRelease", "", new {placeholder="Select a release from the list OR paste a sha-1 key from a github commit", @maxlength="50", @id="txb_FromRelease", @tabindex="2", @onchange="DropDownIndexClear('ddl_FromRelease');", @style="width: 800px; position: absolute; top: 0px; left: 0px; z-index: 2; font-size: larger;", @class="form-control"}); 
+            @Html.DropDownList("ddl_FromRelease", slist_Releases, null, new {@id="ddl_FromRelease", @tabindex="1000", @onchange="DropDownTextToBox(this,'txb_FromRelease');", @style="position: absolute; top: 0px; left: 0px; z-index: 1; width: 825px;", @class="form-control selectpicker"})
+        </span>
+    </div> 
+    <div class="form-group" style="margin-top:10px;">
+        @Html.Label("To:", new {@class="col-sm-1 control-label", @style="font-size: 20px; font-weight:normal; margin-top:-2px"})
+        <span style="position:relative">
+            @Html.TextBox("txb_ToRelease", "", new {@placeholder="Select a release from the list OR paste a sha-1 key from a github commit", @maxlength="50", @id="txb_ToRelease", @tabindex="2", @onchange="DropDownIndexClear('ddl_ToRelease');", @style="width: 800px; position: absolute; top: 0px; left: 0px; z-index: 2; font-size: larger;", @class="form-control"}); 
+            @Html.DropDownList("ddl_ToRelease", slist_Releases, null, new {@id="ddl_ToRelease", @tabindex="1000", @onchange="DropDownTextToBox(this,'txb_ToRelease');", @style="position: absolute; top: 0px; left: 0px; z-index: 1; width: 825px;", @class="form-control selectpicker"})
+        </span>
+    </div>
+    @Html.TextBox("repo",  @repo, new { @type = "hidden" })
+
+    <div class="form-group">
+         <button type="submit" class="btn btn-primary btn-lg btn-block col-sm-offset-1" style="width:825px; margin-top:15px;">Submit Selection</button>
+    </div>
+}

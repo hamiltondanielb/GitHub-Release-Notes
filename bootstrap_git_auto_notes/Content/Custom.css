@@ -1,0 +1,35 @@
+﻿.highlight {
+    background-color:#dff0d8; 
+}
+.commit_date{
+    color: #333;
+}
+
+.select-free
+{
+    position: absolute;
+    z-index: 10; /*any value*/
+    overflow: hidden; /*must have*/
+    width: 247px; /*must have for any value*/ /*width of area +5*/
+}
+.select-free iframe
+{
+    display: none; /*sorry for IE5*/
+    display: /**/ block; /*sorry for IE5*/
+    position: absolute; /*must have*/
+    top: 0px; /*must have*/
+    left: 0px; /*must have*/
+    z-index: -1; /*must have*/
+    filter: mask(); /*must have*/
+    width: 3000px; /*must have for any big value*/
+    height: 3000px /*must have for any big value*/;
+}
+.select-free .bd
+{
+    padding: 11px;
+}
+
+.selectpicker option
+{
+    font-size: larger;
+}

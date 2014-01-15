@@ -1,0 +1,59 @@
+﻿@helper ShowIssue(List<bootstrap_git_auto_notes.GitClasses.Issue> issues, string group)
+{
+    int counter = 1;
+    foreach (bootstrap_git_auto_notes.GitClasses.Issue issue in issues)
+    {
+        <div id="@issue.id">@issue.title</div>
+        <input type="hidden" id="input_@issue.id" name="@group-@counter" value="@issue.title" />
+        counter++;
+    }    
+}
+
+@helper ShowCommits(List<bootstrap_git_auto_notes.GitClasses.BaseCommit> base_commits)
+{
+    var url = new System.Web.Mvc.UrlHelper(Context.Request.RequestContext);
+    DateTime lastDateTime = new DateTime();
+    int counter = 0;
+    <table class="table table-striped">
+    <tr><th>Include?</th><th>Comment Message</th><th></th><th></th><th></th><th></th><th>SHA-1 hash</th></tr>
+    @foreach (bootstrap_git_auto_notes.GitClasses.BaseCommit base_commit in base_commits)
+    {  
+        counter += 1;
+                            
+        if(lastDateTime != base_commit.commit.author.date.Date) 
+        {
+            <tr class="commit_date"><td colspan="7"><div><span class="label label-default"><span class="glyphicon glyphicon-calendar"></span> @base_commit.commit.author.date.ToString("MMM dd, yyyy")</span></div></td></tr>
+            lastDateTime = base_commit.commit.author.date.Date;
+        }
+            <tr id="@base_commit.sha">
+                <td><input id="checkbox_@counter" name="checkbox_@counter" type="checkbox" checked="checked" /></td>
+                <!--<td><label>base_commit.commit.author.name</label></td>-->
+                <td>@base_commit.commit.message</td>
+                <td><input type="hidden" id="record_sha_@counter" name="record_sha_@counter" value="@base_commit.sha" /></td>
+                <td><input type="hidden" id="record_message_@counter" name="record_message_@counter" value="@base_commit.commit.message" /></td>
+                <td><input type="hidden" id="record_url_@counter" name="record_url_@counter" value="@base_commit.html_url" /></td>
+                <td><input type="hidden" id="record_name_@counter" name="record_name_@counter" value="@base_commit.commit.author.name" /></td>
+                <td><a href ="@base_commit.html_url">@base_commit.sha.Substring(0,7)</a></td>
+            </tr>
+    }
+    </table>
+}
+
+@helper ShowRepos(List<bootstrap_git_auto_notes.GitClasses.Repository> repositories)
+{
+    <h3>Choose a Repository</h3>
+    <table class="table table-hover table-condensed" id="repo_table"><tbody>                                                          
+        @foreach (bootstrap_git_auto_notes.GitClasses.Repository repository in repositories)
+        {
+            <tr><td>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="repository" id="optionsRadios1" value="@repository.full_name">
+                        @repository.name.Replace("ININServices/", String.Empty)
+                    </label>
+                </div>
+            </td></tr>
+        }  
+     </tbody></table>
+}
+

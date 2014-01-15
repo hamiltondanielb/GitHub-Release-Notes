@@ -1,0 +1,70 @@
+﻿@{
+    ViewBag.Title = "Add Label to All Repositories";
+}
+
+@section JavaScript {
+    @Scripts.Render("~/Scripts/DisplayMessages.js");
+}
+
+<h3><b>Add</b> a label to every repository on the account</h3>
+@using (Html.BeginForm("AddLabelToAllRepos", "Home", FormMethod.Post, new { @class = "form-horizontal", @role = "form" }))
+{
+     <div class="form-group"> 
+        @Html.Label("Name", new { @class = "control-label col-sm-1" })
+        <div class="col-sm-11">
+            @Html.TextBox("label_names_text", null, new{@class = "form-control", @placeholder = "Comma delimited lists are acceptable"})
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-11">
+            <button type="submit" class="btn btn-primary btn-md btn-block">Add</button>
+        </div>
+    </div>
+}
+
+<br /><br />
+
+<h3><b>Remove</b> a label from every repository on the account</h3>
+@using (Html.BeginForm("RemoveLabelFromAllRepos", "Home", FormMethod.Post, new { @class = "form-horizontal", @role = "form" }))
+{
+     <div class="form-group">       
+        @Html.Label("Select", new { @class = "control-label col-sm-1" })
+        <div class="col-sm-11">
+            @Html.DropDownList("label_name", new SelectList(ViewBag.labels), "WARNING: This will remove a label regardless of if it is being used on an issue!", new{@class = "form-control"})
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-11">
+            <button type="submit" class="btn btn-primary btn-md btn-block">Remove</button>
+        </div>
+    </div>
+}
+
+<br /><br />
+
+<h3><b>Rename</b> a label on every repository on the account</h3>
+@using (Html.BeginForm("RenameLabelForAllRepos", "Home", FormMethod.Post, new { @class = "form-horizontal", @role = "form" }))
+{
+    <div class="form-group">
+        @Html.Label("Change", new { @class = "control-label col-sm-1" })
+        <div class="col-sm-11">
+            @Html.DropDownList("old_label_name", new SelectList(ViewBag.labels),"Select an existing label to rename", new{@class = "form-control"})
+        </div>
+     </div>
+     
+    <div class="form-group">       
+        @Html.Label("To", new { @class = "control-label col-sm-1" })
+        <div class="col-sm-11">
+            @Html.TextBox("new_label_name", null, new{@class = "form-control"})
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-11">
+            <button type="submit" class="btn btn-primary btn-md btn-block">Rename</button>
+        </div>
+    </div>
+}
+

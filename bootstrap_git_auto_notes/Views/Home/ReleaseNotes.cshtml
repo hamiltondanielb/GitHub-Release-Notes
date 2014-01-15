@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "ReleaseNotes";
+}
+
+@using (Html.BeginForm("ReleaseNotes", "Home", FormMethod.Post, new { @class = "form-horizontal", @role ="form"}))
+{
+    List<SelectListItem> items = new List<SelectListItem>();
+   
+    @Html.TextBox("repo", "@ViewBag.repo", new { @type = "hidden" })
+    foreach(bootstrap_git_auto_notes.GitClasses.Release release in ViewBag.releases)
+    {
+         items.Add(new SelectListItem() { Text = release.name, Value = release.tag_name, Selected = false });
+    }
+    List<bootstrap_git_auto_notes.GitClasses.Release> releases = ViewBag.releases as List<bootstrap_git_auto_notes.GitClasses.Release>;
+    SelectList slist_Releases = new SelectList(items, "Value", "Text");
+    
+    <div class="form-group">
+        @Html.Label("From:", new {@class="col-sm-1 control-label"})
+        <span style="position:relative">
+            @Html.TextBox("txb_FromRelease", "", new {@maxlength="50", @id="txb_FromRelease", @tabindex="2", @onchange="DropDownIndexClear('ddl_FromRelease');", @style="width: 600px; position: absolute; top: 0px; left: 0px; z-index: 2;", @class="form-control"}); 
+            @Html.DropDownList("ddl_FromRelease", slist_Releases, null, new {@id="ddl_FromRelease", @tabindex="1000", @onchange="DropDownTextToBox(this,'txb_FromRelease');", @style="position: absolute; top: 0px; left: 0px; z-index: 1; width: 625px;", @class="form-control selectpicker"})
+        </span>
+    </div> 
+    <div class="form-group">
+        @Html.Label("To:", new {@class="col-sm-1 control-label"})
+        <span style="position:relative">
+            @Html.TextBox("txb_ToRelease", "", new {@maxlength="50", @id="txb_ToRelease", @tabindex="2", @onchange="DropDownIndexClear('ddl_ToRelease');", @style="width: 600px; position: absolute; top: 0px; left: 0px; z-index: 2;", @class="form-control"}); 
+            @Html.DropDownList("ddl_ToRelease", slist_Releases, null, new {@id="ddl_ToRelease", @tabindex="1000", @onchange="DropDownTextToBox(this,'txb_ToRelease');", @style="position: absolute; top: 0px; left: 0px; z-index: 1; width: 625px;", @class="form-control selectpicker"})
+        </span>
+    </div>
+    
+    <div class="form-group">
+         <button type="submit" class="btn btn-primary btn-md btn-block col-sm-offset-1" style="width:625px; margin-top:5px;">Submit Selection</button>
+    </div>
+}
+
+<h1>Release Notes</h1>
+<div id="releaseNotesContainer"/>
+@using (Html.BeginForm("DownloadDocx", "Home"))
+{
+    <h3>Features added in this release:</h3>
+    <div id="features_closed">@Helpers.ShowIssue(ViewBag.issues_closedNOTbelong, "features_closed")</div>
+    
+    <h3>Issues fixed in this release:</h3>
+    <div id="issues_closedNOtbelong">@Helpers.ShowIssue(ViewBag.issues_closedNOTbelong, "closedNOTbelong")</div>
+    
+    <h3>Known issues created/found in this release:</h3>
+    <div id="issues_openANDbelong">@Helpers.ShowIssue(ViewBag.issues_openANDbelong, "openANDbelong")</div>
+
+    <h3>Pre-existing issues not fixed in this release:</h3>
+    <div id="issues_openNOTbelong">@Helpers.ShowIssue(ViewBag.issues_openNOTbelong, "openNOTbelong")</div>
+    
+    <br /><br />
+        
+    <h2>The Change log</h2>
+    <div id="commit_log">@Helpers.ShowCommits(ViewBag.commits)</div>
+    
+    <input type="hidden" id="fromRelease" name="fromRelease" value="@ViewBag.fromRelease" />
+    <input type="hidden" id="toRelease" name="toRelease" value="@ViewBag.toRelease" />
+    
+    <div class="form-group">
+         <button type="submit" class="btn btn-primary btn-lg btn-block">Generate and download document</button>
+    </div>
+}
