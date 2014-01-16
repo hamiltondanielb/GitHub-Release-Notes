@@ -94,7 +94,7 @@ namespace bootstrap_git_auto_notes.Controllers
                 List<Issue> issues_openNOTbelong = new List<Issue>();
                 List<Issue> issues_closedNOTbelong = new List<Issue>();
                 List<Issue> features_closed = new List<Issue>();
-
+                // This commit is acting funny
                 foreach (Issue issue in issues)
                 {
                     if (issue.created_at < endCommit.commit.author.date)
