@@ -15,6 +15,7 @@ using System.IO;
 
 namespace bootstrap_git_auto_notes.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private string clientURL = "https://api.github.com";
@@ -23,8 +24,10 @@ namespace bootstrap_git_auto_notes.Controllers
         private string owner = "stephenweaver";
         private string org = "ININServices";
 
+        // Set this to whatever label is going to indicate that a github issue is NOT aa bug/defect
         private string feature_label_name = "enhancement";
 
+        
         public ActionResult Index()
         {
             try
