@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Configuration;
 using bootstrap_git_auto_notes.GitClasses;
 using RestSharp;
 using System.Xml.Linq;
@@ -11,36 +12,77 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.IO;
-
+using bootstrap_git_auto_notes.Models;
+using System.Web.Security;
+using WebMatrix.WebData;
 
 namespace bootstrap_git_auto_notes.Controllers
 {
     [Authorize]
+    [bootstrap_git_auto_notes.Filters.InitializeSimpleMembership]
+    [ValidateUser]
     public class HomeController : Controller
     {
         private string clientURL = "https://api.github.com";
-        private string username = "sjwsgm@gmail.com";
-        private string password = "92SWeaves2";
-        private string owner = "stephenweaver";
+        private string username = "inin-services";
+        private string password = "engineer money spread look";
+        private string owner = "inin-services";
+        //private string username = "stephenweaver";
+        //private string password = "92SWeaves2";
+        //private string owner = "stephenweaver";
         private string org = "ININServices";
 
         // Set this to whatever label is going to indicate that a github issue is NOT aa bug/defect
         private string feature_label_name = "enhancement";
 
         
+
         public ActionResult Index()
         {
             try
             {
-                List<Repository> repositories = GetAllRepositories(clientURL, username, password);
-                
-                ViewBag.repositories = repositories;
+                if (ValidateUser())
+                {
+                    List<Repository> repositories = GetAllRepositories(clientURL, username, password);
 
-                return View();
+                    ViewBag.repositories = repositories;
+                    return View();
+                }
+
+                return View("NotAuthorized");
+                
             }
             catch (Exception ex)
             {
                 return View("Error");
+            }
+        }
+
+        private bool ValidateUser()
+        {
+            try
+            {
+                UsersContext user_context = new UsersContext();
+                MembershipUser member = Membership.GetUser();
+                int UserID = Int32.Parse(member.ProviderUserKey.ToString());
+                //UserProfile user = user_context.UserProfiles.Where(d => d.UserId == UserID).First();
+                ExternalUserInformation git_info = user_context.ExternalUsers.Where(d => d.UserId == UserID).First();
+
+                RestClient client = new RestClient(clientURL);
+                client.Authenticator = new HttpBasicAuthenticator(username, password);
+                RestRequest request = new RestRequest("orgs/{org}/members/{user}", Method.GET);
+                request.AddUrlSegment("org", org);
+                request.AddUrlSegment("user", git_info.login);
+                var temp = client.Execute(request);
+                if (temp.StatusCode == System.Net.HttpStatusCode.NoContent)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch(Exception ex)
+            {
+                return false;
             }
         }
 
@@ -102,22 +144,29 @@ namespace bootstrap_git_auto_notes.Controllers
                         if (issue.state.CompareTo("open") == 0)
                         {
                             if (issue.created_at < startCommit.commit.author.date)
-                                if(issue.labels.Contains(feature_label))
                                 issues_openNOTbelong.Insert(0, issue);
                             else
                                 issues_openANDbelong.Insert(0, issue);
+
                         }
                         else if (issue.state.CompareTo("closed") == 0)
                         {
-                            if (issue.labels.Contains(feature_label) && issue.closed_at < endCommit.commit.author.date)
+                            string labelsString = string.Empty;
+                            foreach (Label sLabel in issue.labels)
+                            {
+                                labelsString += sLabel.name;
+                            }
+                            if (labelsString.Contains(feature_label_name) && 
+                                issue.closed_at < endCommit.commit.author.date &&
+                                issue.closed_at > startCommit.commit.author.date)
                             {
                                 features_closed.Insert(0, issue);
                             }
                             else
                             {
                                 if (issue.created_at < startCommit.commit.author.date &&
-                                   issue.closed_at > startCommit.commit.author.date &&
-                                   issue.closed_at < endCommit.author.date)
+                                   issue.closed_at < endCommit.commit.author.date &&
+                                    issue.closed_at > startCommit.commit.author.date)
                                 {
                                     issues_closedNOTbelong.Insert(0, issue);
                                 }
@@ -147,7 +196,7 @@ namespace bootstrap_git_auto_notes.Controllers
                 ViewBag.FromRelease = txb_FromRelease;
                 ViewBag.ToRelease = txb_ToRelease;
                 commits.Reverse();
-                ViewBag.commits = commits;
+                ViewBag.commits = comparison.commits;
 
                 ViewBag.releases = releases;
                 return View();
@@ -445,22 +494,36 @@ namespace bootstrap_git_auto_notes.Controllers
             string openNOTbelong = string.Empty;
             while (!String.IsNullOrEmpty(formData[dataName + "-" + ++counter]))
             {
-                Paragraph p = new Paragraph(new Run(new Text(formData[dataName + "-" + counter])))
-                {
-                    ParagraphProperties = new ParagraphProperties()
-                    {
-                        ContextualSpacing = new ContextualSpacing(),
-                        ParagraphStyleId = new ParagraphStyleId() { Val = "ListParagraph" },
-                        NumberingProperties = new NumberingProperties()
-                        {
-                            NumberingId = new NumberingId() { Val = 1 },
-                            NumberingLevelReference = new NumberingLevelReference() { Val = 0 }
-                        }
-                    }
-                };
+                Paragraph p = CreateListItem(formData[dataName + "-" + counter], 0, 1);
                 document.Append(p);
+                if (formData[dataName + "-body-" + counter] != string.Empty)
+                {
+                    {
+                        p = CreateListItem(formData[dataName + "-body-" + counter], 1, 1);
+                        document.Append(p);
+                    }
+                }
             }
         }
+
+
+        private Paragraph CreateListItem(string content, int level, int numbering)
+        {
+            return new Paragraph(new Run(new Text(content)))
+            {
+                ParagraphProperties = new ParagraphProperties()
+                {
+                    ContextualSpacing = new ContextualSpacing(),
+                    ParagraphStyleId = new ParagraphStyleId() { Val = "ListParagraph" },
+                    NumberingProperties = new NumberingProperties()
+                    {
+                        NumberingId = new NumberingId() { Val = numbering },
+                        NumberingLevelReference = new NumberingLevelReference() { Val = level }
+                    }
+                }
+            };
+        }
+
 
         private TableCell CreateTableCell(string contents, string cell_color = "ffffff", int width = 0)
         {

@@ -3,8 +3,17 @@
     int counter = 1;
     foreach (bootstrap_git_auto_notes.GitClasses.Issue issue in issues)
     {
-        <div id="@issue.id">@issue.title</div>
+        <div id="@issue.id" class="issue-title">@issue.title</div>
+        <div id="comment-@issue.id">
+            @if (issue.body.CompareTo(String.Empty) != 0) 
+            { 
+                <div class="issue-body">@issue.body</div>
+            }
+
+        </div>
         <input type="hidden" id="input_@issue.id" name="@group-@counter" value="@issue.title" />
+        <input type="hidden" id="input_body_@issue.id" name="@group-body-@counter" value="@issue.body" />
+    
         counter++;
     }    
 }
@@ -15,7 +24,7 @@
     DateTime lastDateTime = new DateTime();
     int counter = 0;
     <table class="table table-striped">
-    <tr><th>Include?</th><th>Comment Message</th><th></th><th></th><th></th><th></th><th>SHA-1 hash</th></tr>
+    <tr><th><input type="checkbox" name="vehicle" value="checked" id="master_checkbox" checked="checked"> Include?</th><th>Comment Message</th><th></th><th></th><th></th><th></th><th>SHA-1 hash</th></tr>
     @foreach (bootstrap_git_auto_notes.GitClasses.BaseCommit base_commit in base_commits)
     {  
         counter += 1;

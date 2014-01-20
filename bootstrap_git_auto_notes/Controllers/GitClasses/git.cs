@@ -195,7 +195,7 @@ namespace bootstrap_git_auto_notes.GitClasses
         public int ahead_by { get; set; }
         public int behind_by { get; set; }
         public int total_commits { get; set; }
-        public List<Commits> commits { get; set; }
+        public List<BaseCommit> commits { get; set; }
         public List<File> files { get; set; }
     }
 

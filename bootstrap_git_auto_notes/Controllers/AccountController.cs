@@ -240,7 +240,28 @@ namespace bootstrap_git_auto_notes.Controllers
                 string loginData = OAuthWebSecurity.SerializeProviderUserId(result.Provider, result.ProviderUserId);
                 ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(result.Provider).DisplayName;
                 ViewBag.ReturnUrl = returnUrl;
-                return View("ExternalLoginConfirmation", new RegisterExternalLoginModel { UserName = result.UserName, ExternalLoginData = loginData });
+                return View("ExternalLoginConfirmation", new RegisterExternalLoginModel
+                {
+                    UserName = result.UserName,
+                    ExternalLoginData = loginData,
+                    login = result.ExtraData["login"],
+                    id = result.ExtraData["id"],
+                    avatar_url = result.ExtraData["avatar_url"],
+                    gravatar_id = result.ExtraData["gravatar_id"],
+                    url = result.ExtraData["url"],
+                    html_url = result.ExtraData["html_url"],
+                    followers_url = result.ExtraData["followers_url"],
+                    following_url = result.ExtraData["following_url"],
+                    gists_url = result.ExtraData["gists_url"],
+                    starred_url = result.ExtraData["starred_url"],
+                    subscriptions_url = result.ExtraData["subscriptions_url"],
+                    organizations_url = result.ExtraData["organizations_url"],
+                    repos_url = result.ExtraData["repos_url"],
+                    events_url = result.ExtraData["events_url"],
+                    received_events_url = result.ExtraData["received_events_url"],
+                    type = result.ExtraData["type"],
+                    site_admin = result.ExtraData["site_admin"]
+                });
             }
         }
 
@@ -270,7 +291,31 @@ namespace bootstrap_git_auto_notes.Controllers
                     if (user == null)
                     {
                         // Insert name into the profile table
-                        db.UserProfiles.Add(new UserProfile { UserName = model.UserName });
+                        UserProfile newUser = db.UserProfiles.Add(new UserProfile { UserName = model.UserName });
+                        db.SaveChanges();
+
+                        db.ExternalUsers.Add(new ExternalUserInformation
+                        {
+                            UserId = newUser.UserId,
+                            login = model.login,
+                            id = model.id,
+                            avatar_url = model.avatar_url,
+                            gravatar_id = model.gravatar_id,
+                            url = model.url,
+                            html_url = model.html_url,
+                            followers_url = model.followers_url,
+                            following_url = model.following_url,
+                            gists_url = model.gists_url,
+                            starred_url = model.starred_url,
+                            subscriptions_url = model.subscriptions_url,
+                            organizations_url = model.organizations_url,
+                            repos_url = model.repos_url,
+                            events_url = model.events_url,
+                            received_events_url = model.received_events_url,
+                            type = model.type,
+                            site_admin = model.site_admin
+
+                        });
                         db.SaveChanges();
 
                         OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.UserName);

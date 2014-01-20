@@ -16,6 +16,7 @@ namespace bootstrap_git_auto_notes.Models
         }
 
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<ExternalUserInformation> ExternalUsers { get; set; }
     }
 
     [Table("UserProfile")]
@@ -27,6 +28,30 @@ namespace bootstrap_git_auto_notes.Models
         public string UserName { get; set; }
     }
 
+    [Table("ExtraUserInformation")]
+    public class ExternalUserInformation
+    {
+        public string id { get; set; }
+        public int UserId { get; set; }
+        public string login { get; set; }
+        public string avatar_url { get; set; }
+        public string gravatar_id { get; set; }
+        public string url { get; set; }
+        public string html_url { get; set; }
+        public string followers_url { get; set; }
+        public string following_url { get; set; }
+        public string gists_url { get; set; }
+        public string starred_url { get; set; }
+        public string subscriptions_url { get; set; }
+        public string organizations_url { get; set; }
+        public string repos_url { get; set; }
+        public string events_url { get; set; }
+        public string received_events_url { get; set; }
+        public string type { get; set; }
+        public string site_admin { get; set; }
+        public string access_token { get; set; }
+    }
+
     public class RegisterExternalLoginModel
     {
         [Required]
@@ -34,6 +59,24 @@ namespace bootstrap_git_auto_notes.Models
         public string UserName { get; set; }
 
         public string ExternalLoginData { get; set; }
+
+        public string login { get; set; }
+        public string id { get; set; }
+        public string avatar_url { get; set; }
+        public string gravatar_id { get; set; }
+        public string url { get; set; }
+        public string html_url { get; set; }
+        public string followers_url { get; set; }
+        public string following_url { get; set; }
+        public string gists_url { get; set; }
+        public string starred_url { get; set; }
+        public string subscriptions_url { get; set; }
+        public string organizations_url { get; set; }
+        public string repos_url { get; set; }
+        public string events_url { get; set; }
+        public string received_events_url { get; set; }
+        public string type { get; set; }
+        public string site_admin { get; set; }
     }
 
     public class LocalPasswordModel

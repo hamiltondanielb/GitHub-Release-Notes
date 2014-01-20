@@ -2,6 +2,11 @@
     ViewBag.Title = "ReleaseNotes";
 }
 
+@section JavaScript{
+    @Scripts.Render("~/Scripts/check_all.js")
+}
+
+
 @using (Html.BeginForm("ReleaseNotes", "Home", FormMethod.Post, new { @class = "form-horizontal", @role ="form"}))
 {
     List<SelectListItem> items = new List<SelectListItem>();
@@ -39,7 +44,7 @@
 @using (Html.BeginForm("DownloadDocx", "Home"))
 {
     <h3>Features added in this release:</h3>
-    <div id="features_closed">@Helpers.ShowIssue(ViewBag.issues_closedNOTbelong, "features_closed")</div>
+    <div id="features_closed">@Helpers.ShowIssue(ViewBag.features_closed, "features_closed")</div>
     
     <h3>Issues fixed in this release:</h3>
     <div id="issues_closedNOtbelong">@Helpers.ShowIssue(ViewBag.issues_closedNOTbelong, "closedNOTbelong")</div>
@@ -53,7 +58,14 @@
     <br /><br />
         
     <h2>The Change log</h2>
-    <div id="commit_log">@Helpers.ShowCommits(ViewBag.commits)</div>
+    if(ViewBag.commits.Count > 0) 
+    {
+        <div id="commit_log">@Helpers.ShowCommits(ViewBag.commits)</div>
+    }
+    else
+    {
+        <div id="commit_log_empty">There was nothing new commited in the release comparison</div>
+    }
     
     <input type="hidden" id="fromRelease" name="fromRelease" value="@ViewBag.fromRelease" />
     <input type="hidden" id="toRelease" name="toRelease" value="@ViewBag.toRelease" />

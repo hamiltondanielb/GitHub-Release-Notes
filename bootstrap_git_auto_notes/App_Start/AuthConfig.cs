@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using Microsoft.Web.WebPages.OAuth;
 using bootstrap_git_auto_notes.Models;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using WebMatrix.WebData;
 
 namespace bootstrap_git_auto_notes
 {
+    
     public static class AuthConfig
     {
         public static void RegisterAuth()
@@ -27,6 +31,8 @@ namespace bootstrap_git_auto_notes
             //    appSecret: "");
 
             //OAuthWebSecurity.RegisterGoogleClient();
+
+            
         }
     }
 }

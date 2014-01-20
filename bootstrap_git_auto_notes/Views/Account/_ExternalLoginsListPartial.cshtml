@@ -13,13 +13,14 @@ else
     {
     @Html.AntiForgeryToken()
     <fieldset id="socialLoginList">
-        <legend>Log in using another service</legend>
+        @*<legend>Log in using another service</legend>*@
         <p>
         @foreach (AuthenticationClientData p in Model)
         {
-            <button type="submit" name="provider" value="@p.AuthenticationClient.ProviderName" title="Log in using your @p.DisplayName account">@p.DisplayName</button>
+            <button type="submit" name="provider" value="@p.AuthenticationClient.ProviderName" title="Log in using your @p.DisplayName account"><img src="../../Content/images/github-logo.png" alt="" /></button>
         }
         </p>
+        
     </fieldset>
     }
 }

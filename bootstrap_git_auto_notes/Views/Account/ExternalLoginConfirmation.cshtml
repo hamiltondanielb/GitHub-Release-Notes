@@ -27,6 +27,23 @@
             </li>
         </ol>
         @Html.HiddenFor(m => m.ExternalLoginData)
+        @Html.HiddenFor(m => m.login)
+        @Html.HiddenFor(m => m.id)
+        @Html.HiddenFor(m => m.avatar_url)
+        @Html.HiddenFor(m => m.gravatar_id)
+        @Html.HiddenFor(m => m.url)
+        @Html.HiddenFor(m => m.html_url)
+        @Html.HiddenFor(m => m.followers_url)
+        @Html.HiddenFor(m => m.following_url)
+        @Html.HiddenFor(m => m.gists_url)
+        @Html.HiddenFor(m => m.starred_url)
+        @Html.HiddenFor(m => m.subscriptions_url)
+        @Html.HiddenFor(m => m.organizations_url)
+        @Html.HiddenFor(m => m.repos_url)
+        @Html.HiddenFor(m => m.events_url)
+        @Html.HiddenFor(m => m.received_events_url)
+        @Html.HiddenFor(m => m.type)
+        @Html.HiddenFor(m => m.site_admin)
         <input type="submit" value="Register" />
     </fieldset>
 }

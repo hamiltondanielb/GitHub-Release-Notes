@@ -10,8 +10,12 @@
     <body>
         <nav class="navbar navbar-default" role="navigation">
              <a class="navbar-brand" href="~/Home/Index">Github release documentation</a>
+            @Html.Partial("_LoginPartial")
         </nav>
      <div class="container">
+         <div class="row"> 
+            
+         </div>
          <div class="row">
             @Html.Partial("_Flash")
          </div>
@@ -26,5 +30,6 @@
      @Scripts.Render("~/bundles/bootstrapjs")
   
      @RenderSection("JavaScript", required: false)
+     @RenderSection("Scripts", required: false)
     </body>
 </html> 
