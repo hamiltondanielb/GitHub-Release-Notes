@@ -4,6 +4,7 @@
 
 @section JavaScript{
     @Scripts.Render("~/Scripts/check_all.js")
+    @Scripts.Render("~/Scripts/AutoCompleteRelease.js");
 }
 
 
@@ -12,11 +13,11 @@
     List<SelectListItem> items = new List<SelectListItem>();
    
     @Html.TextBox("repo", "@ViewBag.repo", new { @type = "hidden" })
-    foreach(bootstrap_git_auto_notes.GitClasses.Release release in ViewBag.releases)
+    foreach (bootstrap_git_auto_notes.GitClasses.GitRef release in ViewBag.releases)
     {
-         items.Add(new SelectListItem() { Text = release.name, Value = release.tag_name, Selected = false });
+        items.Add(new SelectListItem() { Text = release.Object.type + ": " + release.@ref, Value = release.@ref, Selected = false });
     }
-    List<bootstrap_git_auto_notes.GitClasses.Release> releases = ViewBag.releases as List<bootstrap_git_auto_notes.GitClasses.Release>;
+    List<bootstrap_git_auto_notes.GitClasses.GitTag> releases = ViewBag.releases as List<bootstrap_git_auto_notes.GitClasses.GitTag>;
     SelectList slist_Releases = new SelectList(items, "Value", "Text");
     
     <div class="form-group">
@@ -39,20 +40,20 @@
     </div>
 }
 
-<h1>Release Notes</h1>
 <div id="releaseNotesContainer"/>
 @using (Html.BeginForm("DownloadDocx", "Home"))
 {
-    <h3>Features added in this release:</h3>
+    <br />
+    <h3>Features added in this release</h3>
     <div id="features_closed">@Helpers.ShowIssue(ViewBag.features_closed, "features_closed")</div>
     
-    <h3>Issues fixed in this release:</h3>
+    <h3>Issues fixed in this release</h3>
     <div id="issues_closedNOtbelong">@Helpers.ShowIssue(ViewBag.issues_closedNOTbelong, "closedNOTbelong")</div>
     
-    <h3>Known issues created/found in this release:</h3>
+    <h3>Known issues created/found in this release</h3>
     <div id="issues_openANDbelong">@Helpers.ShowIssue(ViewBag.issues_openANDbelong, "openANDbelong")</div>
 
-    <h3>Pre-existing issues not fixed in this release:</h3>
+    <h3>Pre-existing issues not fixed in this release</h3>
     <div id="issues_openNOTbelong">@Helpers.ShowIssue(ViewBag.issues_openNOTbelong, "openNOTbelong")</div>
     
     <br /><br />

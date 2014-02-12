@@ -15,6 +15,7 @@ using System.IO;
 using bootstrap_git_auto_notes.Models;
 using System.Web.Security;
 using WebMatrix.WebData;
+using System.Text.RegularExpressions;
 
 namespace bootstrap_git_auto_notes.Controllers
 {
@@ -25,7 +26,7 @@ namespace bootstrap_git_auto_notes.Controllers
     {
         private string clientURL = "https://api.github.com";
         private string username = "inin-services";
-        private string password = "engineer money spread look";
+        private string password = "1nteract1ve!";
         private string owner = "inin-services";
         //private string username = "stephenweaver";
         //private string password = "92SWeaves2";
@@ -43,7 +44,7 @@ namespace bootstrap_git_auto_notes.Controllers
             {
                 if (ValidateUser())
                 {
-                    List<Repository> repositories = GetAllRepositories(clientURL, username, password);
+                    List<Repository> repositories = GetAllRepositories(clientURL, username, password).OrderBy(x=>x.name).ToList();
 
                     ViewBag.repositories = repositories;
                     return View();
@@ -91,7 +92,7 @@ namespace bootstrap_git_auto_notes.Controllers
         {
             try
             {
-                List<Release> releases = GetReleases(clientURL, username, password, owner, repository);
+                List<GitRef> releases = GetReleases(clientURL, username, password, owner, repository);
 
                 ViewBag.releases = releases;
                 ViewBag.repo = repository.Replace(owner + "/", String.Empty);
@@ -111,7 +112,7 @@ namespace bootstrap_git_auto_notes.Controllers
             try
             {
                 Label feature_label = new Label();
-                List<Release> releases = GetReleases(clientURL, username, password, owner, repo);
+                List<GitRef> releases = GetReleases(clientURL, username, password, owner, repo);
 
                 BaseCommit startCommit = GetSingleCommit(clientURL, username, password, owner, repo, txb_FromRelease);
                 BaseCommit endCommit = GetSingleCommit(clientURL, username, password, owner, repo, txb_ToRelease);
@@ -129,7 +130,7 @@ namespace bootstrap_git_auto_notes.Controllers
                     }
                 }
 
-                Compare comparison = CompareCommits(clientURL, username, password, owner, repo, startCommit.sha, endCommit.sha);
+                Compare comparison = CompareCommits(clientURL, username, password, owner, repo, txb_FromRelease, txb_ToRelease);
                 List<BaseCommit> commits = GetCommits(clientURL, username, password, owner, repo, null, null, null);
 
                 List<Issue> issues_openANDbelong = new List<Issue>();
@@ -599,9 +600,9 @@ namespace bootstrap_git_auto_notes.Controllers
         {
             RestClient client = new RestClient(clientURL);
             client.Authenticator = new HttpBasicAuthenticator(username, password);
-            //RestRequest request = new RestRequest("/orgs/ININServices/repos", Method.GET);
-            RestRequest request = new RestRequest("/user/repos", Method.GET);
-
+            RestRequest request = new RestRequest("orgs/" + org + "/repos", Method.GET);
+            //RestRequest request = new RestRequest("/user/repos", Method.GET);
+            request.AddParameter("per_page", "100");
             return client.Execute<List<Repository>>(request).Data;
         }
 
@@ -632,10 +633,10 @@ namespace bootstrap_git_auto_notes.Controllers
         {
             RestClient client = new RestClient(clientURL);
             client.Authenticator = new HttpBasicAuthenticator(username, password);
-            RestRequest request = new RestRequest("repos/{owner}/{repo}/milestones", Method.GET);
-            request.AddParameter("state", state);
-            request.AddUrlSegment("owner", owner);
-            request.AddUrlSegment("repo", repo);
+            RestRequest request = new RestRequest("repos/" + @repo + "/milestones", Method.GET);
+            //request.AddParameter("state", state);
+            //request.AddUrlSegment("owner", owner);
+            //request.AddUrlSegment("repo", repo);
             return client.Execute<List<Milestone>>(request).Data;
         }
 
@@ -648,24 +649,24 @@ namespace bootstrap_git_auto_notes.Controllers
             client.Authenticator = new HttpBasicAuthenticator(username, password);
 
             // Get no assignee
-            RestRequest request = new RestRequest("repos/{owner}/{repo}/issues", Method.GET);
+            RestRequest request = new RestRequest("repos/" + @repo + "/issues", Method.GET);
             request.AddParameter("milestone", milestone);
             request.AddParameter("state", state);
             request.AddParameter("assignee", "none");
-            request.AddUrlSegment("owner", owner);
-            request.AddUrlSegment("repo", repo);
+            //request.AddUrlSegment("owner", owner);
+            request.AddUrlSegment("repo", @repo);
             newIssues = client.Execute<List<Issue>>(request).Data;
 
             if (newIssues != null && newIssues.Count > 0)
                 issues.AddRange(newIssues);
 
             // Get with assingee
-            request = new RestRequest("repos/{owner}/{repo}/issues", Method.GET);
+            request = new RestRequest("repos/" + @repo + "/issues", Method.GET);
             request.AddParameter("milestone", milestone);
             request.AddParameter("state", state);
             request.AddParameter("assignee", "*");
-            request.AddUrlSegment("owner", owner);
-            request.AddUrlSegment("repo", repo);
+            //request.AddUrlSegment("owner", owner);
+            request.AddUrlSegment("repo", @repo);
             newIssues = client.Execute<List<Issue>>(request).Data;
 
             if (newIssues != null && newIssues.Count > 0)
@@ -678,33 +679,62 @@ namespace bootstrap_git_auto_notes.Controllers
         {
             RestClient client = new RestClient(clientURL);
             client.Authenticator = new HttpBasicAuthenticator(username, password);
-            RestRequest request = new RestRequest("repos/{owner}/{repo}/labels", Method.GET);
-            request.AddUrlSegment("owner", owner);
-            request.AddUrlSegment("repo", repo);
+            RestRequest request = new RestRequest("repos/" + @repo + "/labels", Method.GET);
+            //request.AddUrlSegment("owner", owner);
+            request.AddUrlSegment("repo", @repo);
             return client.Execute<List<Label>>(request).Data;
         }
 
-        private List<Release> GetReleases(string clientURL, string username, string password, string owner, string repo)
+        private List<GitRef> GetReleases(string clientURL, string username, string password, string owner, string repo)
         {
-            repo = repo.Replace(owner + "/", String.Empty);
+            //repo = repo.Replace(org + "/", String.Empty);
+            //RestClient client = new RestClient(clientURL);
+            //client.Authenticator = new HttpBasicAuthenticator(username, password);
+            //RestRequest request = new RestRequest("repos/{owner}/{repo}/releases", Method.GET);
+            //request.AddUrlSegment("owner", org);
+            //request.AddUrlSegment("repo", repo);
+
+            //List<Release> releases = client.Execute<List<Release>>(request).Data;
+
+            //releases.Reverse();
+
+
             RestClient client = new RestClient(clientURL);
             client.Authenticator = new HttpBasicAuthenticator(username, password);
-            RestRequest request = new RestRequest("repos/{owner}/{repo}/releases", Method.GET);
-            request.AddUrlSegment("owner", owner);
-            request.AddUrlSegment("repo", repo);
+            RestRequest request = new RestRequest("repos/" + @repo + "/git/refs", Method.GET);
+            //request.AddUrlSegment("owner", org);
+            //request.AddUrlSegment("repo", @repo);
+            List<GitRef> gitReferences = client.Execute<List<GitRef>>(request).Data;
+            List<GitRef> toBeDeleted = new List<GitRef>();
+            string pattern = @"[a-zA-z-]*$";
+            Regex rgx = new Regex(pattern);
+            
+            foreach (GitRef gitRef in gitReferences)
+            {
+                gitRef.@ref = gitRef.@ref.Split('/').Last();
+                if(gitRef.@ref.CompareTo("head") == 0 || gitRef.@ref.CompareTo("merge") == 0)
+                {
+                    toBeDeleted.Add(gitRef);
+                }
+            }
 
-            List<Release> releases = client.Execute<List<Release>>(request).Data;
-            releases.Reverse();
-            return releases;
+            foreach (GitRef gitRef in toBeDeleted)
+            {
+                gitReferences.Remove(gitRef);
+            }
+
+            gitReferences.Reverse();
+
+            return gitReferences;
         }
 
         private Compare CompareCommits(string clientURL, string username, string password, string owner, string repo, string commit1, string commit2)
         {
             RestClient client = new RestClient(clientURL);
             client.Authenticator = new HttpBasicAuthenticator(username, password);
-            RestRequest request = new RestRequest("repos/{owner}/{repo}/compare/{base}...{head}", Method.GET);
-            request.AddUrlSegment("owner", owner);
-            request.AddUrlSegment("repo", repo);
+            RestRequest request = new RestRequest("repos/" + @repo + "/compare/{base}...{head}", Method.GET);
+            //request.AddUrlSegment("owner", owner);
+            //request.AddUrlSegment("repo", @repo);
             request.AddUrlSegment("base", commit1);
             request.AddUrlSegment("head", commit2);
             return client.Execute<Compare>(request).Data;
@@ -717,9 +747,9 @@ namespace bootstrap_git_auto_notes.Controllers
 
             RestClient client = new RestClient(clientURL);
             client.Authenticator = new HttpBasicAuthenticator(username, password);
-            RestRequest request = new RestRequest("repos/{owner}/{repo}/commits", Method.GET);
-            request.AddUrlSegment("owner", owner);
-            request.AddUrlSegment("repo", repo);
+            RestRequest request = new RestRequest("repos/" + @repo + "/commits", Method.GET);
+            //request.AddUrlSegment("owner", owner);
+            //request.AddUrlSegment("repo", @repo);
 
             if (sha != null)
                 request.AddParameter("sha", sha);
@@ -745,10 +775,12 @@ namespace bootstrap_git_auto_notes.Controllers
         {
             RestClient client = new RestClient(clientURL);
             client.Authenticator = new HttpBasicAuthenticator(username, password);
-            RestRequest request = new RestRequest("repos/{owner}/{repo}/commits/{sha}", Method.GET);
-            request.AddUrlSegment("owner", owner);
-            request.AddUrlSegment("repo", repo);
+            RestRequest request = new RestRequest("repos/" + @repo + "/commits/{sha}", Method.GET);
+            //request.AddUrlSegment("owner", org);
+            //request.AddUrlSegment("repo", @repo);
             request.AddUrlSegment("sha", sha);
+
+            var temp = client.Execute(request);
 
             return client.Execute<BaseCommit>(request).Data;
         }

@@ -11,12 +11,14 @@
 {
     List<SelectListItem> items = new List<SelectListItem>();
     string repo = ViewBag.repo;
+    var name = string.Empty;
     
-    foreach(bootstrap_git_auto_notes.GitClasses.Release release in ViewBag.releases)
+    foreach(bootstrap_git_auto_notes.GitClasses.GitRef release in ViewBag.releases)
     {
-         items.Add(new SelectListItem() { Text = release.name, Value = release.tag_name, Selected = false });
+
+        items.Add(new SelectListItem() { Text = release.Object.type + ": " + release.@ref, Value = release.@ref, Selected = false });
     }
-    List<bootstrap_git_auto_notes.GitClasses.Release> releases = ViewBag.releases as List<bootstrap_git_auto_notes.GitClasses.Release>;
+    List<bootstrap_git_auto_notes.GitClasses.GitRef> releases = ViewBag.releases as List<bootstrap_git_auto_notes.GitClasses.GitRef>;
     SelectList slist_Releases = new SelectList(items, "Value", "Text");
     
     <div class="form-group">

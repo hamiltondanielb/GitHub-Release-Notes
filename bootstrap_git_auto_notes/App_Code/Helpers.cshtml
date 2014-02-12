@@ -3,18 +3,33 @@
     int counter = 1;
     foreach (bootstrap_git_auto_notes.GitClasses.Issue issue in issues)
     {
-        <div id="@issue.id" class="issue-title">@issue.title</div>
-        <div id="comment-@issue.id">
-            @if (issue.body.CompareTo(String.Empty) != 0) 
-            { 
-                <div class="issue-body">@issue.body</div>
-            }
-
-        </div>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <div id="@issue.id" class="issue-title">@issue.title</div>
+     
+                @if (issue.body.CompareTo(String.Empty) != 0) 
+                { 
+                    <div id="comment-@issue.id">
+                        <div class="issue-body">@issue.body</div>
+                    </div>
+                }
+            </li>
+        </ul>
         <input type="hidden" id="input_@issue.id" name="@group-@counter" value="@issue.title" />
         <input type="hidden" id="input_body_@issue.id" name="@group-body-@counter" value="@issue.body" />
     
         counter++;
+    }
+    
+    if(issues.Count == 0)
+    {
+         <ul class="list-group">
+            <li class="list-group-item">
+                <div>
+                    <div class="issue-body">No issues were found for this category</div>
+                </div>
+            </li>
+        </ul>
     }    
 }
 
@@ -60,6 +75,7 @@
                         <input type="radio" name="repository" id="optionsRadios1" value="@repository.full_name">
                         @repository.name.Replace("ININServices/", String.Empty)
                     </label>
+                    <button type="submit" class="btn btn-primary btn-sm pull-right repo-submit" >Submit Selection</button>
                 </div>
             </td></tr>
         }  

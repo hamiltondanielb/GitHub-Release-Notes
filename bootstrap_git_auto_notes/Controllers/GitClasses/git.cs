@@ -302,4 +302,33 @@ namespace bootstrap_git_auto_notes.GitClasses
         public string tarball_url { get; set; }
         public string zipball_url { get; set; }
     }
+
+    public class TagCommit
+    {
+        public string sha { get; set; }
+        public string url { get; set; }
+    }
+
+    public class GitTag
+    {
+        public string name { get; set; }
+        public string zipball_url { get; set; }
+        public string tarball_url { get; set; }
+        public TagCommit commit { get; set; }
+    }
+
+    public class RefObject
+    {
+        public string type { get; set; }
+        public string sha { get; set; }
+        public string url { get; set; }
+    }
+
+    public class GitRef
+    {
+        public string @ref { get; set; }
+        public string url { get; set; }
+        public RefObject @Object { get; set; }
+    }
+
 }
